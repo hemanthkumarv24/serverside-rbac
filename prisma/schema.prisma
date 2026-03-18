@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  role          String    @default("VIEWER")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  pages         Page[]
+}
+
+model Page {
+  id           String      @id @default(cuid())
+  title        String
+  content      String
+  status       String      @default("DRAFT")
+  previewToken String?     @unique
+  authorId     String
+  author       User        @relation(fields: [authorId], references: [id])
+  publishedAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
