@@ -3,6 +3,7 @@ import * as pageService from '@/services/pageService'
 import type { Role } from '@/types'
 import { notFound } from 'next/navigation'
 import PageEditor from './PageEditor'
+import { sanitizeContent } from '@/lib/utils/sanitize'
 
 export default async function PageDetailPage({
   params,
@@ -39,7 +40,7 @@ export default async function PageDetailPage({
       page={{
         id: page.id,
         title: page.title,
-        content: page.content,
+        content: sanitizeContent(page.content),
         status: page.status,
         previewToken: page.previewToken,
         authorId: page.authorId,

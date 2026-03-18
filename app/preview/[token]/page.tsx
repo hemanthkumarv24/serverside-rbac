@@ -1,5 +1,6 @@
 import * as pageService from '@/services/pageService'
 import { notFound } from 'next/navigation'
+import { sanitizeContent } from '@/lib/utils/sanitize'
 
 export default async function PreviewPage({
   params,
@@ -22,7 +23,7 @@ export default async function PreviewPage({
         </div>
         <article className="prose lg:prose-xl max-w-none">
           <h1>{page.title}</h1>
-          <div dangerouslySetInnerHTML={{ __html: page.content }} />
+          <div dangerouslySetInnerHTML={{ __html: sanitizeContent(page.content) }} />
         </article>
         <div className="mt-8 pt-8 border-t text-sm text-gray-500">
           <p>Author: {page.author?.name || page.author?.email}</p>
