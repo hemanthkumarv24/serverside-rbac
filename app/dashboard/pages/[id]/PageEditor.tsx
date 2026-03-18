@@ -16,6 +16,7 @@ interface PageData {
 }
 
 interface PageEditorProps {
+  /** page.content must be pre-sanitized by the caller before rendering via dangerouslySetInnerHTML */
   page: PageData
   canEdit: boolean
   canPublish: boolean

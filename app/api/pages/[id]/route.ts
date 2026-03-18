@@ -53,7 +53,9 @@ export async function PUT(
     return NextResponse.json(page)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal server error'
-    const status = message.includes('Permission denied') ? 403 : message.includes('not found') ? 404 : 500
+    let status = 500
+    if (message.includes('Permission denied')) status = 403
+    else if (message.includes('not found')) status = 404
     return NextResponse.json({ error: message }, { status })
   }
 }
