@@ -94,6 +94,20 @@ npm test
 └── __tests__/             # Unit tests
 ```
 
+## API Endpoints
+
+| Method | Endpoint | Description | Required Role |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/pages` | List pages (filtered by role) | Any authenticated |
+| `POST` | `/api/pages` | Create a draft page | `EDITOR`, `ADMIN`, `SUPER_ADMIN` |
+| `GET` | `/api/pages/:id` | Get a single page | Any authenticated (RBAC filtered) |
+| `PUT` | `/api/pages/:id` | Update a draft page | `EDITOR`, `ADMIN`, `SUPER_ADMIN` |
+| `DELETE` | `/api/pages/:id` | Delete a page | `ADMIN`, `SUPER_ADMIN` |
+| `POST` | `/api/pages/:id/publish` | Publish a page | `ADMIN`, `SUPER_ADMIN` |
+| `POST` | `/api/pages/:id/preview` | Generate preview token | `EDITOR`, `ADMIN`, `SUPER_ADMIN` |
+| `GET` | `/api/users` | List all users | `ADMIN`, `SUPER_ADMIN` |
+| `PATCH` | `/api/users/:id/role` | Update user role | `SUPER_ADMIN` |
+
 ## RBAC Architecture
 
 The RBAC system is enforced server-side at multiple layers:
@@ -102,3 +116,51 @@ The RBAC system is enforced server-side at multiple layers:
 2. **API Routes** — Check session role before calling services
 3. **Server Components** — Filter data based on user role
 4. **Layout Guards** — Redirect unauthorized users
+
+### Permission Matrix
+
+| Permission | VIEWER | EDITOR | ADMIN | SUPER_ADMIN |
+|-----------|--------|--------|-------|-------------|
+| View published pages | ✅ | ✅ | ✅ | ✅ |
+| View draft pages | ❌ | ✅ | ✅ | ✅ |
+| View preview pages | ❌ | ✅ | ✅ | ✅ |
+| Create pages | ❌ | ✅ | ✅ | ✅ |
+| Edit pages | ❌ | ✅ | ✅ | ✅ |
+| Publish pages | ❌ | ❌ | ✅ | ✅ |
+| Delete pages | ❌ | ❌ | ✅ | ✅ |
+| Manage users | ❌ | ❌ | ✅ | ✅ |
+| Assign roles | ❌ | ❌ | ❌ | ✅ |
+
+## Deployment (Vercel)
+
+1. Push your code to GitHub
+2. Connect the repository to [Vercel](https://vercel.com)
+3. Set the following environment variables in Vercel dashboard:
+   - `DATABASE_URL` — Your PostgreSQL connection string (use Vercel Postgres or Neon)
+   - `AUTH_SECRET` — A secure random string (run `openssl rand -base64 32`)
+   - `NEXTAUTH_URL` — Your deployed URL (e.g. `https://your-app.vercel.app`)
+4. For PostgreSQL deployment, update `prisma/schema.prisma`:
+   - Change `provider = "sqlite"` to `provider = "postgresql"`
+5. Run database migrations: `npx prisma migrate deploy`
+6. Run the seed script: `npm run db:seed`
+
+> **Note:** For local development, SQLite is used for simplicity. For production on Vercel, switch to PostgreSQL (Vercel Postgres, Neon, Supabase, etc.).
+
+## CI/CD
+
+GitHub Actions runs on every push:
+- Installs dependencies
+- Generates Prisma client
+- Runs all unit tests (Vitest)
+
+A successful CI run is required before deploying to Vercel via branch protection rules.
+
+## Commit Convention
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:` — New features
+- `fix:` — Bug fixes
+- `refactor:` — Code refactoring
+- `test:` — Test additions/changes
+- `chore:` — Build, config, dependency updates
+- `docs:` — Documentation changes
