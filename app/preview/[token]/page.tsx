@@ -5,9 +5,10 @@ import { sanitizeContent } from '@/lib/utils/sanitize'
 export default async function PreviewPage({
   params,
 }: {
-  params: { token: string }
+  params: Promise<{ token: string }>
 }) {
-  const page = await pageService.getPageByPreviewToken(params.token)
+  const { token } = await params
+  const page = await pageService.getPageByPreviewToken(token)
 
   if (!page) {
     notFound()

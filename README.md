@@ -4,7 +4,7 @@ A production-grade Next.js 14 application demonstrating server-side Role-Based A
 
 ## Tech Stack
 
-- **Next.js 14** (App Router)
+- **Next.js 15** (App Router)
 - **TypeScript** (strict mode)
 - **Tailwind CSS**
 - **Prisma ORM** + SQLite

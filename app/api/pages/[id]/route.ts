@@ -6,16 +6,17 @@ import type { Role } from '@/types'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const userRole = session.user.role as Role
-    const page = await pageService.getPage(params.id, userRole)
+    const page = await pageService.getPage(id, userRole)
 
     if (!page) {
       return NextResponse.json({ error: 'Page not found' }, { status: 404 })
@@ -31,9 +32,10 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -49,7 +51,7 @@ export async function PUT(
     }
 
     const userRole = session.user.role as Role
-    const page = await pageService.editDraft(params.id, userRole, parsed.data)
+    const page = await pageService.editDraft(id, userRole, parsed.data)
     return NextResponse.json(page)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal server error'
@@ -62,16 +64,17 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const userRole = session.user.role as Role
-    await pageService.deletePage(params.id, userRole)
+    await pageService.deletePage(id, userRole)
     return NextResponse.json({ success: true })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal server error'

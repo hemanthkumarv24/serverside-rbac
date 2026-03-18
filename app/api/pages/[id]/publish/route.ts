@@ -5,16 +5,17 @@ import type { Role } from '@/types'
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const userRole = session.user.role as Role
-    const page = await pageService.publishPage(params.id, userRole)
+    const page = await pageService.publishPage(id, userRole)
     return NextResponse.json(page)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal server error'

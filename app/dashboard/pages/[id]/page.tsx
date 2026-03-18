@@ -8,14 +8,15 @@ import { sanitizeContent } from '@/lib/utils/sanitize'
 export default async function PageDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const session = await auth()
   const userRole = session?.user?.role as Role
 
   let page
   try {
-    page = await pageService.getPage(params.id, userRole)
+    page = await pageService.getPage(id, userRole)
   } catch {
     return (
       <div className="px-4 py-6">

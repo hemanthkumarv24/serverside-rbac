@@ -6,16 +6,17 @@ import type { Role } from '@/types'
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await req.json()
-    const parsed = updateUserRoleSchema.safeParse({ userId: params.id, ...body })
+    const parsed = updateUserRoleSchema.safeParse({ userId: id, ...body })
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Validation failed', details: parsed.error.flatten() },
@@ -24,7 +25,7 @@ export async function PATCH(
     }
 
     const actorRole = session.user.role as Role
-    const user = await pageService.updateUserRole(actorRole, params.id, parsed.data.role)
+    const user = await pageService.updateUserRole(actorRole, id, parsed.data.role)
     return NextResponse.json(user)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal server error'
